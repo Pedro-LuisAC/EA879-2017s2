@@ -46,7 +46,7 @@ PROGRAMA:
         salvar_imagem($2, &I,1);
         }
         |
-        Programa FIM EOL{
+        PROGRAMA FIM EOL{
         printf("Programa finalizado.\n");
         return 0;
         }
