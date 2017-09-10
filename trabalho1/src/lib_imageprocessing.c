@@ -51,7 +51,7 @@ imagem abrir_imagem(char *nome_do_arquivo) {
 
 }
 
-imagem abrir_imagem_retornapixel(char *nome_do_arquivo) {
+imagem abrir_imagem_retornapixel(char *nome_do_arquivo) { //fiz essa funcao para retornar os maiores valores do RGB
   FIBITMAP *bitmapIn;
   int x, y;
   float red=0.0,green=0.0,blue=0.0;
@@ -75,7 +75,7 @@ imagem abrir_imagem_retornapixel(char *nome_do_arquivo) {
   I.g = malloc(sizeof(float) * x * y);
   I.b = malloc(sizeof(float) * x * y);
 
-   for (int i=0; i<x; i++) {
+   for (int i=0; i<x; i++) { 
      for (int j=0; j <y; j++) {
       int idx;
       FreeImage_GetPixelColor(bitmapIn, i, j, &color);
@@ -86,7 +86,7 @@ imagem abrir_imagem_retornapixel(char *nome_do_arquivo) {
       I.g[idx] = color.rgbGreen;
       I.b[idx] = color.rgbBlue;
 
-      if(I.r[idx]>=red){
+      if(I.r[idx]>=red){// eu que modifiquei essa parte da funcao para encontrar o menor valor
         red = I.r[idx]; //acha o menor valor de cada RGB
       }
       if (I.g[idx]>=green){
@@ -106,7 +106,7 @@ printf("B: %f\n",blue);
 
 }
 
-void salvar_imagem(char *nome_do_arquivo, imagem *I,float mult) {
+void salvar_imagem(char *nome_do_arquivo, imagem *I,float mult) { //adicionei o parametro mult
   FIBITMAP *bitmapOut;
   RGBQUAD color;
 
@@ -118,7 +118,7 @@ void salvar_imagem(char *nome_do_arquivo, imagem *I,float mult) {
       int idx;
 
       idx = i + (j*I->width);
-      color.rgbRed = mult*(I->r[idx]);
+      color.rgbRed = mult*(I->r[idx]);  //adicionei o termo mult para multiplicar cada RGB
       color.rgbGreen = mult*(I->g[idx]);
       color.rgbBlue = mult*(I->b[idx]);
 

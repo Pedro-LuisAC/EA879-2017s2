@@ -11,11 +11,10 @@ void yyerror(char *);
 
 %%
   
-[0-9]+\.*[0-9]*  {
+[0-9]+\.*[0-9]*  { //acha float
         for(int i = 0; i<yyleng;i++){
           yylval.fval = atof(yytext);
         }
-        printf("Achei fator: %f\n",yylval.fval);
         return FATOR;
 }
 
@@ -28,12 +27,11 @@ void yyerror(char *);
 
 \" { return ASPA; }
 
-[a-zA-Z0-9\.]+  {
+[a-zA-Z0-9\.]+  { //Acha nome do arquivo
         for (int i = 0; i < yyleng; i++ )
           yylval.strval[i] = yytext[i];
 
         yylval.strval[yyleng] = '\0';
-        printf ("Achei nome: %s\n", yylval.strval);
         return STRING;
        }
 
@@ -48,11 +46,9 @@ void yyerror(char *);
   return SINAL;
 }
 \[  {
-  printf("abre\n");
   return ABRECOL;
 }
 \]   {
-  printf("fecha\n");
   return FECHACOL;
 }
 
