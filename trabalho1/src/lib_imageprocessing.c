@@ -6,11 +6,9 @@
 
 #include <FreeImage.h>
 
-/*
-imagem abrir_imagem(char *nome_do_arquivo);
-void salvar_imagem(char *nome_do_arquivo);
-void liberar_imagem(imagem *i);
- */
+
+
+ 
 
 imagem abrir_imagem(char *nome_do_arquivo) {
   FIBITMAP *bitmapIn;
@@ -110,22 +108,51 @@ void salvar_imagem(char *nome_do_arquivo, imagem *I,float mult) { //adicionei o 
   FIBITMAP *bitmapOut;
   RGBQUAD color;
 
+
   printf("Salvando imagem %d por %d...\n", I->width, I->height);
   bitmapOut = FreeImage_Allocate(I->width, I->height, 24, 0, 0, 0);
+
 
    for (int i=0; i<I->width; i++) {
      for (int j=0; j<I->height; j++) {
       int idx;
 
       idx = i + (j*I->width);
-      color.rgbRed = mult*(I->r[idx]);  //adicionei o termo mult para multiplicar cada RGB
-      color.rgbGreen = mult*(I->g[idx]);
-      color.rgbBlue = mult*(I->b[idx]);
+      color.rgbRed = (I->r[idx]);  //adicionei o termo mult para multiplicar cada RGB
+      color.rgbGreen = (I->g[idx]);
+      color.rgbBlue = (I->b[idx]);
 
       FreeImage_SetPixelColor(bitmapOut, i, j, &color);
     }
   }
 
+
+  
+
   FreeImage_Save(FIF_JPEG, bitmapOut, nome_do_arquivo, JPEG_DEFAULT);
 }
 
+void mult_pixel(imagem *I, float valor) {
+
+    for (int i=0; i<I->width; i++) {
+     for (int j=0; j<I->height; j++) {
+      int idx;
+
+      idx = i + (j*I->width);
+
+      I->r[idx] = I->r[idx]*valor;
+      if(I->r[idx] > 255.0){
+        I->r[idx] = 255.0;
+      }
+      I->g[idx] = I->g[idx]*valor;
+      if(I->g[idx] > 255.0){
+        I->g[idx] = 255.0;
+      }
+      I->b[idx] = I->b[idx]*valor;
+      if(I->b[idx] > 255.0){
+        I->b[idx] = 255.0;
+      }
+    }
+  }
+    
+}

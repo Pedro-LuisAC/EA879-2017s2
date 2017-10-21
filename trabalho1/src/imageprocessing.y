@@ -29,14 +29,16 @@ PROGRAMA:
         printf("Copiando %s para %s\n", $4, $2);
         imagem I = abrir_imagem($4);
         printf("Li imagem %d por %d\n", I.width, I.height);
-        salvar_imagem($2, &I,1/$6); //o ultimo argumento dessa funçao eh o fator que se multiplica cada pixel
+        mult_pixel(&I,1/$6);
+        salvar_imagem($2, &I,1); //o ultimo argumento dessa funçao eh o fator que se multiplica cada pixel
         }
         |
         PROGRAMA STRING IGUAL STRING SINAL FATOR EOL{ //multiplica cada pixel por uma constante - ex: teste.jpg = demo.jpg * 0.5
         printf("Copiando %s para %s\n", $4, $2);
         imagem I = abrir_imagem($4);
         printf("Li imagem %d por %d\n", I.width, I.height);
-        salvar_imagem($2, &I,$6);
+        mult_pixel(&I, $6);
+        salvar_imagem($2, &I,1);
         }
         |
         PROGRAMA STRING IGUAL STRING EOL{ //apenas copia um arquivo para outro - ex: teste.jpg = demo.jpg
