@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "imageprocessing.h"
 #include <FreeImage.h>
+#include <math.h>
 
 void yyerror(char *c);
 int yylex(void);
@@ -12,7 +13,7 @@ int yylex(void);
   int     ival;
   float fval;
 }
-%token <strval> STRING
+%token <strval> STRING THREAD PROCESSO
 %token <ival> VAR IGUAL EOL ASPA 
 %token <fval> FATOR
 %left SOMA SINAL DIVISAO ABRECOL FECHACOL FIM
@@ -41,6 +42,22 @@ PROGRAMA:
         salvar_imagem($2, &I,1);
         }
         |
+        PROGRAMA STRING IGUAL STRING SINAL FATOR THREAD EOL{ //multiplica cada pixel por uma constante - ex: teste.jpg = demo.jpg * 0.5
+        printf("Copiando %s para %s\n", $4, $2);
+        imagem I = abrir_imagem($4);
+        printf("Li imagem %d por %d\n", I.width, I.height);
+        varias_thread(&I, $6);
+        salvar_imagem($2, &I,1);
+        }
+        |
+        PROGRAMA STRING IGUAL STRING SINAL FATOR PROCESSO EOL{ //multiplica cada pixel por uma constante - ex: teste.jpg = demo.jpg * 0.5
+        printf("Copiando %s para %s\n", $4, $2);
+        imagem I = abrir_imagem($4);
+        printf("Li imagem %d por %d\n", I.width, I.height);
+        varios_processo(&I, $6);
+        salvar_imagem($2, &I,1);
+        }
+        |
         PROGRAMA STRING IGUAL STRING EOL{ //apenas copia um arquivo para outro - ex: teste.jpg = demo.jpg
         printf("Copiando %s para %s\n", $4, $2);
         imagem I = abrir_imagem($4);
@@ -53,6 +70,7 @@ PROGRAMA:
         return 0;
         }
         |
+
         ;
 
 

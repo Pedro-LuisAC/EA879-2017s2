@@ -20,9 +20,22 @@ void yyerror(char *);
 
 
 [a-z]  {
-        yylval.ival = yytext[0] - 'a';
-        return VAR;
+        for(int i = 0; i<yyleng;i++){
+          yylval.fval = atof(yytext);
+        }
        }
+
+
+[t][h] {
+  yylval.ival = yytext[0] - 'a';
+        return THREAD;
+}
+
+[p][r] {
+  yylval.ival = yytext[0] - 'a';
+        return PROCESSO;
+}
+
 
 
 \" { return ASPA; }

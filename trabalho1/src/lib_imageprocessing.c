@@ -1,14 +1,25 @@
-
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "imageprocessing.h"
 
 #include <FreeImage.h>
+#include <pthread.h>
+#include <time.h>
+
+#include <sys/types.h>
+
+#include <sys/time.h>
+#include <unistd.h>
+
+#include <sys/mman.h>
+
+ #define n_threads 4
+#define n_processos 4
 
 
 
- 
+struct timeval rt0, rt1, drt;
 
 imagem abrir_imagem(char *nome_do_arquivo) {
   FIBITMAP *bitmapIn;
@@ -134,6 +145,8 @@ void salvar_imagem(char *nome_do_arquivo, imagem *I,float mult) { //adicionei o 
 
 void mult_pixel(imagem *I, float valor) {
 
+    gettimeofday(&rt0, NULL);
+
     for (int i=0; i<I->width; i++) {
      for (int j=0; j<I->height; j++) {
       int idx;
@@ -154,5 +167,150 @@ void mult_pixel(imagem *I, float valor) {
       }
     }
   }
+
+  gettimeofday(&rt1, NULL);
+  timersub(&rt1, &rt0, &drt);
+
+  printf("Tempo real: %ld.%06ld segundos\n", drt.tv_sec, drt.tv_usec);
     
+}
+
+ void varias_thread(imagem *I, float valor){
+   
+   pthread_t threads[n_threads];
+   gettimeofday(&rt0, NULL);
+   conjunto[0].inicio = 0;
+   conjunto[0].fim = ((I->width)*(I->height))/n_threads;
+ 
+        for(int k=0;(k<n_threads);k++){
+          
+          (conjunto[k]).K = I;
+          
+          conjunto[k].valor = valor;
+          if (k) {
+            conjunto[k].inicio = conjunto[k-1].fim +1 ;
+            conjunto[k].fim = conjunto[k-1].fim + conjunto[0].fim + 1;
+          }
+          
+        
+          pthread_create(&(threads[k]),NULL,mult_thread, (void*)(&conjunto[k]));
+          
+        }
+        for(int k=0;(k<n_threads);k++){
+          pthread_join(threads[k],NULL);
+        }
+
+        
+      
+
+  gettimeofday(&rt1, NULL);
+  timersub(&rt1, &rt0, &drt);
+
+  printf("Tempo real: %ld.%06ld segundos\n", drt.tv_sec, drt.tv_usec);
+
+     
+  }
+
+ void mult_thread(struct Conjunto *conjunto) {
+      int idx;
+
+      for(int g = conjunto->inicio; g < (conjunto->fim); g++) {
+
+        
+        conjunto->K->r[g] = (conjunto->K->r[g])*(conjunto->valor);
+          if(conjunto->K->r[g] > 255.0){
+            conjunto->K->r[g] = 255.0;
+          }
+          conjunto->K->g[g] = conjunto->K->g[g]*(conjunto->valor);
+          if(conjunto->K->g[g] > 255.0){
+            conjunto->K->g[g] = 255.0;
+          }
+          conjunto->K->b[g] = conjunto->K->b[g]*(conjunto->valor);
+          if(conjunto->K->b[g] > 255.0){
+            conjunto->K->b[g] = 255.0;
+          }
+
+
+       //return NULL;
+       //pthread_exit(0);
+    }
+ }
+void varios_processo(imagem *I, float valor){
+  pid_t filho[n_processos];
+  int contador = 0;
+  int min[n_processos], max[n_processos];
+  gettimeofday(&rt0, NULL);
+
+  min[0] = 0;
+  max[0] = ((I->width)*(I->height))/n_processos;
+
+  for(int i = 1; i<n_processos; i++){
+    min[i] = max[i-1] + 1;
+    max[i] = max[i-1] + max[0] + 1;
+  }
+  int tam = (I->height)*(I->width);
+  int protection = PROT_READ | PROT_WRITE;
+  int visibility = MAP_SHARED | MAP_ANON;
+  float *rr,*bb,*gg;
+  rr = (float*) mmap(NULL, sizeof(float)*tam, protection, visibility, 0, 0);
+  bb = (float*) mmap(NULL, sizeof(float)*tam, protection, visibility, 0, 0);
+  gg = (float*) mmap(NULL, sizeof(float)*tam, protection, visibility, 0, 0);
+
+  for(int demonio = 0; demonio<tam;demonio++){
+    *(rr+demonio) = I->r[demonio];
+    *(gg+demonio) = I->g[demonio];
+    *(bb+demonio) = I->b[demonio];
+  }
+  //if ((imagem)b==-1) printf("Erro de alocacao!\n");
+  
+
+  for(int i =0; i<n_processos ; i++){
+  
+    filho[i] = fork();
+
+    if(filho[i] == 0){
+
+      mult_pixelapixel(rr,gg,bb,valor,max[i],min[i]);
+      exit(EXIT_SUCCESS);
+
+    }
+    
+
+  }
+
+
+  for(int i=0; i < n_processos; i++){
+    int status;
+    waitpid(filho[i], &status, 0);
+
+
+  }
+  I->r = rr;
+  I->g = gg;
+  I->b = bb;
+
+  gettimeofday(&rt1, NULL);
+  timersub(&rt1, &rt0, &drt);
+
+  printf("Tempo real: %ld.%06ld segundos\n", drt.tv_sec, drt.tv_usec);
+
+
+}
+
+void mult_pixelapixel(float *rr,float *gg,float *bb, int valor, int max,int min){
+
+      for (int j=min;j<(max);j++){
+        *(rr+j) = *(rr+j)*valor;
+        if(*(rr+j) > 255.0){
+          *(rr+j) = 255.0;
+        }
+        *(gg+j) = *(gg+j)*valor;
+        if(*(gg+j) > 255.0){
+          *(gg+j) = 255.0;
+        }
+        *(bb+j) = *(bb+j)*valor;
+        if(*(bb+j) > 255.0){
+          *(bb+j) = 255.0;
+        }
+      }
 }
