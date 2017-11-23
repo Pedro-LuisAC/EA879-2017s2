@@ -13,7 +13,7 @@ int yylex(void);
   int     ival;
   float fval;
 }
-%token <strval> STRING THREAD PROCESSO
+%token <strval> STRING THREAD PROCESSO COLUNA
 %token <ival> VAR IGUAL EOL ASPA 
 %token <fval> FATOR
 %left SOMA SINAL DIVISAO ABRECOL FECHACOL FIM
@@ -39,6 +39,14 @@ PROGRAMA:
         imagem I = abrir_imagem($4);
         printf("Li imagem %d por %d\n", I.width, I.height);
         mult_pixel(&I, $6);
+        salvar_imagem($2, &I,1);
+        }
+        |
+        PROGRAMA STRING IGUAL STRING SINAL FATOR COLUNA EOL{ //multiplica cada pixel por uma constante - ex: teste.jpg = demo.jpg * 0.5
+        printf("Copiando %s para %s\n", $4, $2);
+        imagem I = abrir_imagem($4);
+        printf("Li imagem %d por %d\n", I.width, I.height);
+        col(&I, $6);
         salvar_imagem($2, &I,1);
         }
         |

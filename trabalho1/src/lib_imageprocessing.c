@@ -314,3 +314,33 @@ void mult_pixelapixel(float *rr,float *gg,float *bb, int valor, int max,int min)
         }
       }
 }
+
+
+void col(imagem *I, float valor) {
+
+      gettimeofday(&rt0, NULL);
+
+    for (int i=0; i<(I->width)*(I->height); i++) {
+      int idx;
+
+      idx = i;
+
+      I->r[idx] = I->r[idx]*valor;
+      if(I->r[idx] > 255.0){
+        I->r[idx] = 255.0;
+      }
+      I->g[idx] = I->g[idx]*valor;
+      if(I->g[idx] > 255.0){
+        I->g[idx] = 255.0;
+      }
+      I->b[idx] = I->b[idx]*valor;
+      if(I->b[idx] > 255.0){
+        I->b[idx] = 255.0;
+      }
+    
+  }
+    gettimeofday(&rt1, NULL);
+  timersub(&rt1, &rt0, &drt);
+
+  printf("Tempo real: %ld.%06ld segundos\n", drt.tv_sec, drt.tv_usec);
+}

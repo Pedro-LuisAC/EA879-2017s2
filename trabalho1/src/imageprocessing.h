@@ -28,5 +28,6 @@ void mult_thread(struct Conjunto *conjunto);
 void varias_thread(imagem *I, float valor);
 void mult_pixelapixel(float *rr,float *gg,float *bb, int valor, int max,int min);
 void varios_processo(imagem *I, float valor);
+void col(imagem *I, float valor);
 
 #endif

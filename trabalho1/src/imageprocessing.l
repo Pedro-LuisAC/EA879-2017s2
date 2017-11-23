@@ -31,6 +31,11 @@ void yyerror(char *);
         return THREAD;
 }
 
+[c][o][l] {
+  yylval.ival = yytext[0] - 'a';
+        return COLUNA;
+}
+
 [p][r] {
   yylval.ival = yytext[0] - 'a';
         return PROCESSO;
